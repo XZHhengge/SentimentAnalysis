@@ -1,5 +1,4 @@
-#! /bin/env python
-# -*- coding: utf-8 -*-
+# -*- coding:utf-8 -*-
 """
 预测
 """
@@ -51,24 +50,24 @@ def create_dictionaries(model=None,
         combined= sequence.pad_sequences(combined, maxlen=maxlen)#每个句子所含词语对应的索引，所以句子中含有频数小于10的词语，索引为0
         return w2indx, w2vec,combined
     else:
-        print 'No data provided...'
+        print ('No data provided...')
 
 
 def input_transform(string):
     words=jieba.lcut(string)
     words=np.array(words).reshape(1,-1)
-    model=Word2Vec.load('../model/Word2vec_model.pkl')
+    model=Word2Vec.load('../model/Word2vec_model.pkl', 'rb')
     _,_,combined=create_dictionaries(model,words)
     return combined
 
 
 def lstm_predict(string):
-    print 'loading model......'
-    with open('../model/lstm.yml', 'r') as f:
+    print ('loading model......')
+    with open('../model/lstm.yml', 'r', encoding='utf-8') as f:
         yaml_string = yaml.load(f)
     model = model_from_yaml(yaml_string)
 
-    print 'loading weights......'
+    print ('loading weights......')
     model.load_weights('../model/lstm.h5')
     model.compile(loss='categorical_crossentropy',
                   optimizer='adam',metrics=['accuracy'])
@@ -78,21 +77,20 @@ def lstm_predict(string):
     result=model.predict_classes(data)
     # print result # [[1]]
     if result[0]==1:
-        print string,' positive'
+        print (string,' positive')
     elif result[0]==0:
-        print string,' neural'
+        print (string,' neural')
     else:
-        print string,' negative'
+        print (string,' negative')
 
 
 if __name__=='__main__':
     # string='酒店的环境非常好，价格也便宜，值得推荐'
-    # string='手机质量太差了，傻逼店家，赚黑心钱，以后再也不会买了'
-    # string = "这是我看过文字写得很糟糕的书，因为买了，还是耐着性子看完了，但是总体来说不好，文字、内容、结构都不好"
+    # string = u'''第一：耳机质量极差，我不知道到底是拿次品滥竽充数还是本身产品就差。耳机换货了一次还是有问题我就选择了退货。第二：单买手机3599，加上耳机3699，不知道是我不会算数还是怎么，退款60，我就想问还有40是给你们的小费吗?第三：第一次购买一加手机，在网上看评价还可以，实际用的时候，打~电话，声音时不时的突然变大，有时候吓我一跳，也不知是手机的问题还是耳机的问题，但我想耳机不至于出现这样的问题吧，用在以前的手机的时候都好好的，感觉手机本身不够稳定。'''
+    string = "这是我看过文字写得很糟糕的书，因为买了，还是耐着性子看完了，但是总体来说不好，文字、内容、结构都不好"
     # string = "虽说是职场指导书，但是写的有点干涩，我读一半就看不下去了！"
     # string = "书的质量还好，但是内容实在没意思。本以为会侧重心理方面的分析，但实际上是婚外恋内容。"
     # string = "不是太好"
     # string = "不错不错"
-    string = "真的一般，没什么可以学习的"
-    
+    # string = "真的一般，没什么可以学习的"
     lstm_predict(string)
